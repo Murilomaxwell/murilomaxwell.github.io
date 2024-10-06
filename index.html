@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preparing...</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="assets/eagler/logo.png" rel="icon" type="image/png">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        @keyframes expandContract {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5); 
+            }
+            100% {
+                transform: scale(1); 
+            }
+        }
+
+        @keyframes vibrate {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(0); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .gui-widgets-button {
+            border: none;
+            cursor: pointer;
+            background-image: url('assets/gui/widgets.png');
+            background-position: 256px 190px;
+            width: 200px;
+            height: 20px;
+        }
+        .gui-widgets-button:hover {
+            background-position: 256px 170px;
+        }
+        .eagler-dropdown {
+            background-image: url('assets/eagler/dropdown.png');
+            cursor: pointer;
+            width: 283px;
+            height: 48px;
+        }
+        .eagler-input {
+            background-image: url('assets/eagler/input.png');
+            cursor: pointer;
+            width: 280;
+            height: 44;
+        }
+        .eaglervm-button {
+            font-family: VT323;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+        }
+        .eaglervm-button:hover {
+            color: black;
+            background-color: white;
+        }
+    </style>
+
+</head>
+<body>
+    <script>
+        console.log('Welcome to Eaglercraft Console.')
+        function title(titletext) {document.title = titletext;};
+        function eagtekCrash(error, output) {
+            document.body.innerHTML = '';
+            document.body.style.overflow = 'visible';
+
+            let crashImage = document.createElement('img');
+            crashImage.src = 'assets/eagler/eagtek_crash_top.png';
+            crashImage.style.display = 'block';
+            crashImage.style.margin = '0 auto';
+
+            let titleText = document.createElement('h1')
+            titleText.innerText = 'Game Crashed!'
+            titleText.style.textAlign = 'center';
+            titleText.style.fontSize = '50px';
+            titleText.style.fontWeight = 'bold';
+
+            let errorText = document.createElement('p')
+            errorText.innerText = 'Error Message:\n\n' + error;
+            errorText.style.textAlign = 'center';
+            errorText.style.backgroundColor = 'white';
+
+            let moreInfoBtn = document.createElement('button')
+            moreInfoBtn.innerText = 'Click for More Info';
+            moreInfoBtn.style.margin = '0 auto'; 
+            moreInfoBtn.style.display = 'block';
+
+
+            
+            moreInfoBtn.onclick = function() {
+                moreInfoBtn.remove();
+                fullScript = document.createElement('pre')
+                fullScript.innerHTML = '';
+                output.split('\n').forEach((line, index) => {
+                fullScript.innerHTML += `${index + 1}: ${line}\n`;
+                });
+                fullScript.style.textAlign = 'left';
+                fullScript.style.backgroundColor = 'white';
+                document.body.appendChild(fullScript);
+                alert('Full script is displayed in console.')
+                console.log(fullScript.textContent);
+            }
+            
+
+            document.body.appendChild(crashImage);
+            document.body.appendChild(titleText);
+            document.body.appendChild(errorText);
+            document.body.appendChild(moreInfoBtn);
+        }
+
+        function saveDataToIndexedDB(dbName, storeName, key, data) {
+            let request = window.indexedDB.open(dbName, 1);  // Open or create the database with version 1
+
+            request.onupgradeneeded = function (event) {
+                let db = event.target.result;
+                
+                // Create the object store if it doesn't already exist
+                if (!db.objectStoreNames.contains(storeName)) {
+                    db.createObjectStore(storeName);
+                }
+            };
+
+            request.onsuccess = function (event) {
+                let db = event.target.result;
+                let transaction = db.transaction([storeName], 'readwrite');
+                let store = transaction.objectStore(storeName);
+                
+                // Save the data with the given key
+                let dataRequest = store.put(data, key);
+
+                dataRequest.onerror = function (event) {
+                    console.error("Error saving data: ", event.target.error);
+                };
+            };
+
+            request.onerror = function (event) {
+                console.error("Error opening database: ", event.target.error);
+            };
+        }
+
+        function loadDataFromIndexedDB(dbName, storeName, key) {
+            return new Promise((resolve, reject) => {
+                let request = window.indexedDB.open(dbName, 1);
+
+                request.onsuccess = function (event) {
+                    let db = event.target.result;
+                    let transaction = db.transaction([storeName], 'readonly');
+                    let store = transaction.objectStore(storeName);
+
+                    let dataRequest = store.get(key);
+
+                    dataRequest.onsuccess = function (event) {
+                        let result = event.target.result;
+                        if (result !== undefined && result !== null) {
+                            resolve(result); // Resolve the promise with the result
+                        } else {
+                            console.log("No data found for key: ", key);
+                            resolve(null); // Resolve with null if no data found
+                        }
+                    };
+
+                    dataRequest.onerror = function (event) {
+                        console.error("Error fetching data: ", event.target.error);
+                        reject(event.target.error); // Reject the promise on error
+                    };
+                };
+
+                request.onerror = function (event) {
+                    console.error("Error opening database: ", event.target.error);
+                    reject(event.target.error); // Reject the promise on error
+                };
+            });
+        }
+
+
+
+
+
+
+
+        async function encodeAudio(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const arrayBuffer = await response.arrayBuffer();
+                const base64String = btoa(
+                    new Uint8Array(arrayBuffer)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+                );
+                return base64String;
+            } catch (error) {
+                console.error('Error fetching or encoding audio:', error);
+            }
+        }
+
+        async function main() {
+            let loadingImg = document.createElement('img')
+            loadingImg.id = 'loadingimg'
+            loadingImg.src = 'assets/eagler/extracting.png'  
+            loadingImg.style.objectFit = 'cover'
+            loadingImg.style.display = 'block';
+            loadingImg.style.margin = '0 auto'; 
+            
+
+            let progressText = document.createElement('h1')
+            progressText.id = 'progresstext'
+            progressText.style.textAlign = 'center';
+            progressText.style.fontSize = '50px'; 
+            progressText.style.userSelect = 'none';
+            progressText.textContent = 'Preparing...'
+
+            
+            
+
+
+            document.body.appendChild(loadingImg)
+            document.body.appendChild(progressText)
+            const pyodide = await loadPyodide({
+                wasmMemory: new WebAssembly.Memory({
+                    initial: 32767,
+                    maximum: 32767
+                })
+            });
+
+            let lightMode = true;
+
+            let themeButton = document.createElement("button");
+            themeButton.innerHTML = lightMode ? "Dark Mode" : "Light Mode";
+            themeButton.style.position = "absolute";
+            themeButton.style.top = "0px";
+            themeButton.style.left = "0px";
+            themeButton.style.fontFamily = "Garamond";
+            themeButton.style.fontSize = '24px';
+            themeButton.style.border = lightMode ? '5px solid black' : '5px solid white';
+            themeButton.style.borderRadius = '20px';
+            themeButton.style.cursor = 'pointer';
+
+            // Set the initial image and theme based on the saved value
+            if (lightMode) {
+            loadingImg.src = 'assets/gui/title/mojang.png';
+            document.body.style.background = "white"; 
+            progressText.style.color = 'black';
+            themeButton.style.border = '5px solid black';
+            themeButton.style.color = 'black'
+            themeButton.style.backgroundColor = 'white';
+            } else {
+            loadingImg.src = 'assets/gui/title/mojang_dark.png';
+            document.body.style.background = "black"; 
+            progressText.style.color = 'white';
+            themeButton.style.border = '5px solid white';
+            themeButton.style.color = 'yellow'
+            themeButton.style.backgroundColor = 'black';
+            }
+
+            themeButton.onclick = async function() {
+            lightMode = !lightMode;
+            updateImageAndTheme();
+            };
+
+            function updateImageAndTheme() {
+            if (lightMode) {
+                themeButton.textContent = 'Dark Mode'
+                loadingImg.src = 'assets/gui/title/mojang.png';
+                document.body.style.background = "white"; 
+                progressText.style.color = 'black';
+                themeButton.style.border = '5px solid black';
+                themeButton.style.color = 'black'
+                themeButton.style.backgroundColor = 'white';
+            } else {
+                themeButton.textContent = 'Light Mode'
+                loadingImg.src = 'assets/gui/title/mojang_dark.png';
+                document.body.style.background = "black"; 
+                progressText.style.color = 'white';
+                themeButton.style.border = '5px solid white';
+                themeButton.style.color = 'yellow'
+                themeButton.style.backgroundColor = 'black';
+            }
+            }
+
+            document.body.appendChild(themeButton)
+
+
+            progressText.textContent = 'Importing Modules and Scripts... (26%)'
+            title('26%');
+            let keyboardResponse = await fetch('scripts/keyboard.py')
+            let keyboardScript = await keyboardResponse.text()
+
+            progressText.textContent = 'Importing Modules and Scripts... (67%)'
+            title('67%');
+            let response = await fetch('scripts/eaglercraft.py');
+            let pythonCode = await response.text();
+
+            progressText.textContent = 'Importing Modules and Scripts... (88%)'
+            title('88%');
+            let fontResponse = await fetch('scripts/eagwrite.py');
+            let fontScript = await fontResponse.text()
+
+            loadingImg.src = 'assets/gui/title/mojang.png'
+
+            progressText.textContent = 'Downloading Assets... (90%)'
+            title('90%');
+
+            let devText = await fetch('assets/eagler/dev/devtools.txt');
+            let devTextfileContent = await devText.text();
+
+            let font_charmap = await fetch('assets/font/charmap.txt');
+            let font_charmapContent = await font_charmap.text()
+
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+
+            let soundMusicMenuMenu1 = await encodeAudio('assets/sounds/music/menu/menu1.ogg');
+            let soundMusicMenuMenu2 = await encodeAudio('assets/sounds/music/menu/menu2.ogg');
+            let soundMusicMenuMenu3 = await encodeAudio('assets/sounds/music/menu/menu3.ogg');
+
+            let soundRandomClick = await encodeAudio('assets/sounds/random/click.ogg');
+
+            progressText.textContent = 'Downloading Assets... (91%)'
+            title('91%');
+
+            let soundRecord11 = await encodeAudio('assets/sounds/records/11.ogg')
+            let soundRecord13 = await encodeAudio('assets/sounds/records/13.ogg')
+            let soundRecordBlocks = await encodeAudio('assets/sounds/records/blocks.ogg')
+            let soundRecordCat = await encodeAudio('assets/sounds/records/cat.ogg')
+            progressText.textContent = 'Downloading Assets... (92%)'
+            let soundRecordChirp = await encodeAudio('assets/sounds/records/chirp.ogg')
+            let soundRecordFar = await encodeAudio('assets/sounds/records/far.ogg')
+            let soundRecordMall = await encodeAudio('assets/sounds/records/mall.ogg')
+            progressText.textContent = 'Downloading Assets... (93%)'
+            let soundRecordMellohi = await encodeAudio('assets/sounds/records/mellohi.ogg')
+            let soundRecordStal = await encodeAudio('assets/sounds/records/stal.ogg')
+            let soundRecordStrad = await encodeAudio('assets/sounds/records/strad.ogg')
+            let soundRecordWait = await encodeAudio('assets/sounds/records/wait.ogg')
+            let soundRecordWard = await encodeAudio('assets/sounds/records/ward.ogg')
+
+            progressText.textContent = 'Downloading Assets... (94%)'
+            title('94%');
+
+            let soundPortalPortal = await encodeAudio('assets/sounds/portal/portal.ogg')
+            let soundPortalTravel = await encodeAudio('assets/sounds/portal/travel.ogg')
+            let soundPortalTrigger = await encodeAudio('assets/sounds/portal/trigger.ogg')
+
+            progressText.textContent = 'Downloading Assets... (95%)'
+            title('95%');
+
+            let soundFireFire = await encodeAudio('assets/sounds/fire/fire.ogg')
+            progressText.textContent = 'Downloading Assets... (96%)'
+            title('96%');
+            let soundFireIgnite = await encodeAudio('assets/sounds/fire/ignite.ogg')
+            progressText.textContent = 'Downloading Assets... (97%)'
+            title('97%');
+
+            let soundEnchantHit1 = await encodeAudio('assets/sounds/enchant/thorns/hit1.ogg')
+            progressText.textContent = 'Downloading Assets... (98%)'
+            title('98%');
+            let soundEnchantHit2 = await encodeAudio('assets/sounds/enchant/thorns/hit2.ogg')
+            progressText.textContent = 'Downloading Assets... (99%)'
+            title('99%');
+            let soundEnchantHit3 = await encodeAudio('assets/sounds/enchant/thorns/hit3.ogg')
+            let soundEnchantHit4 = await encodeAudio('assets/sounds/enchant/thorns/hit4.ogg')
+
+            pyodide.setDebug(true)
+
+            let sound_data = {
+                'menu1': soundMusicMenuMenu1, 
+                'menu2': soundMusicMenuMenu2, 
+                'menu3': soundMusicMenuMenu3, 
+                'click': soundRandomClick, 
+                '11': soundRecord11, 
+                '13': soundRecord13, 
+                'blocks': soundRecordBlocks, 
+                'cat': soundRecordCat, 
+                'chirp': soundRecordChirp, 
+                'far': soundRecordFar, 
+                'mall': soundRecordMall, 
+                'mellohi': soundRecordMellohi, 
+                'stal': soundRecordStal, 
+                'strad': soundRecordStrad, 
+                'wait': soundRecordWait, 
+                'ward': soundRecordWard
+            };
+
+
+            saveDataToIndexedDB('soundDB', 'soundStore', 'sound_data', sound_data);
+
+            let output = `from gc import collect\ncollect()\nimport datetime\nfrom ast import literal_eval\nimport random\nimport js\nimport base64\nimport pyodide\nfrom pyodide.ffi import *\nasync def load_indexed_data(db_name, store_name, key): result = await js.loadDataFromIndexedDB(db_name, store_name, key); return js.JSON.stringify(result)\ndev_file = """${devTextfileContent}"""\nsounds = await load_indexed_data('soundDB', 'soundStore', 'sound_data')\nprint(sounds)\ncharmap = ${font_charmapContent}\nwindowW = '${windowWidth}'\nwindowH = '${windowHeight}'\n` + keyboardScript + '\n' + fontScript + '\n' + pythonCode;
+
+            progressText.style.animation = 'expandContract 1s infinite';
+            loadingImg.style.animation = 'expandContract 1s infinite';
+
+            title('Ready');
+            progressText.textContent = 'Press anywhere on the screen to start.';
+
+            bootMenuAvalible = true;
+
+            const bootText = document.createElement('div');
+            bootText.textContent = 'Press Y to open EaglerVM options';
+            bootText.style.position = 'absolute';
+            bootText.style.top = '0px';
+            bootText.style.right = '0px';
+            bootText.style.textAlign = 'center';
+            bootText.style.userSelect = 'none';
+            bootText.style.fontSize = '24px';
+            document.body.appendChild(bootText);
+
+            document.addEventListener('keydown', function(event) {
+                if (event.code === 'KeyY') {
+                    if(bootMenuAvalible == true) {
+                        bootMenuAvalible = false;
+                        console.log('EaglerVM options menu opened.');
+                        document.body.innerHTML = '';
+                        document.body.style.backgroundColor = 'black';
+
+                        const topText = document.createElement('h1')
+                        topText.style.textAlign = 'center';
+                        topText.style.userSelect = 'none';
+                        topText.style.fontSize = '44px';
+                        topText.style.color = 'white';
+                        topText.textContent = 'EaglerVM Options'
+                        topText.style.fontFamily = 'VT323';
+                        document.body.appendChild(topText);
+
+                        const restartButton = document.createElement('h1')
+                        restartButton.className = 'eaglervm-button';
+                        restartButton.textContent = 'Restart'
+                        restartButton.onclick = function() {
+                            window.location.reload();
+                        }
+                        document.body.appendChild(restartButton)
+
+                        const launchButton = document.createElement('h1')
+                        launchButton.className = 'eaglervm-button'
+                        launchButton.textContent = 'Launch Eaglercraft 1.13'
+                        document.body.appendChild(launchButton)
+                    }
+                    else {
+                        console.error('EaglerVM Options is not available once application started.')
+                    }
+                }
+            });
+
+            let pyodideInitialized = false;
+
+            if (bootMenuAvalible == true) {
+                document.body.onclick = async function() {
+                    bootMenuAvalible = false;
+                    bootText.remove();
+                    themeButton.remove();
+                    if (pyodideInitialized) return; // Prevent re-initialization
+                    pyodideInitialized = true; // Set the flag to true
+                    progressText.style.animation = 'none';
+                    loadingImg.style.animation = 'vibrate 0.2s infinite';
+                    progressText.textContent = 'Launching Eaglercraft...';
+                    title('Launching...');
+                    try {
+                        await pyodide.runPythonAsync(output); // Use await inside async function
+                    } catch (error) {
+                        eagtekCrash(error, output);
+                    }
+                };
+            }
+
+        }
+        main();
+    </script>
+</body>
+</html>
