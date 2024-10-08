@@ -71,6 +71,7 @@
 </head>
 <body>
     <script>
+        alert('This project isn\'t done yet. Press OK to continue.')
         console.log('Welcome to Eaglercraft Console.')
         function title(titletext) {document.title = titletext;};
         function eagtekCrash(error, output) {
@@ -207,20 +208,26 @@
         }
 
         async function main() {
-            let loadingImg = document.createElement('img')
-            loadingImg.id = 'loadingimg'
-            loadingImg.src = 'assets/eagler/extracting.png'  
-            loadingImg.style.objectFit = 'cover'
-            loadingImg.style.display = 'block';
-            loadingImg.style.margin = '0 auto'; 
-            
+            function getResponsiveValue(baseValue, maxWidth, minValue) {
+                return `min(${baseValue}px, max(${minValue}px, calc(100vw - 40px)))`;
+            }
 
-            let progressText = document.createElement('h1')
-            progressText.id = 'progresstext'
+            // Create loading image
+            let loadingImg = document.createElement('img');
+            loadingImg.id = 'loadingimg';
+            loadingImg.src = 'assets/eagler/extracting.png';
+            loadingImg.style.objectFit = 'cover';
+            loadingImg.style.display = 'block';
+            loadingImg.style.margin = '20px auto'; 
+            loadingImg.style.width = getResponsiveValue(500, 600, 200); 
+
+            // Create progress text
+            let progressText = document.createElement('h1');
+            progressText.id = 'progresstext';
             progressText.style.textAlign = 'center';
-            progressText.style.fontSize = '50px'; 
+            progressText.style.fontSize = getResponsiveValue(50, 768, 20);
             progressText.style.userSelect = 'none';
-            progressText.textContent = 'Preparing...'
+            progressText.textContent = 'Preparing...';
 
             
             

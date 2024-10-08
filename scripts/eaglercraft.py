@@ -154,9 +154,9 @@ def load_agreement():
     is_agreement_loaded = True
     js.console.log("Loading agreement screen.")
     js.document.body.style.backgroundImage = "url('assets/eagler/editprofile_bg.png')"
-    text1 = eagwrite.write('Information!', windowW / 2 - 140, 200, 'lime', shadow_color='#383838', size=5) 
-    text2 = eagwrite.write('This software is NOT pirated', windowW / 2 - 300, 300, 'red', shadow_color='#383838', size=5) 
-    text3 = eagwrite.write('This is just a RECREATION of Minecraft', windowW / 2 - 400, 400, 'yellow', shadow_color='#383838', size=5) 
+    text1 = eagwrite.write('&l Information', windowW / 2 - 140, 200, 'lime', shadow_color='#383838', size=5) 
+    text2 = eagwrite.write('&o This software is NOT pirated', windowW / 2 - 300, 300, 'red', shadow_color='#383838', size=5) 
+    text3 = eagwrite.write('&n This is just a RECREATION of Minecraft', windowW / 2 - 400, 400, 'yellow', shadow_color='#383838', size=5) 
     text4 = eagwrite.write('Any DMCA request toward this client is unnecessary', windowW / 2 - 700, 500, 'orange', shadow_color='#383838', size=5)
 
     def agreement_profile_page(_):
