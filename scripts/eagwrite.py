@@ -13,7 +13,58 @@ class EagWrite:
         italic_offset = 0
         underline = False
         strikethrough = False
+        glitch = False
 
+        if '&1' in self.text:
+            self.text = self.text.replace('&1', '')
+            color = 'rgb(0, 0, 169)'
+        if '&2' in self.text:
+            self.text = self.text.replace('&2', '')
+            color = 'rgb(1, 170, 1)'
+        if '&3' in self.text:
+            self.text = self.text.replace('&3', '')
+            color = 'rgb(1, 170, 170)'
+        if '&4' in self.text:
+            self.text = self.text.replace('&4', '')
+            color = 'rgb(170, 1, 1)'
+        if '&5' in self.text:
+            self.text = self.text.replace('&5', '')
+            color = 'rgb(170, 1, 170)'
+        if '&6' in self.text:
+            self.text = self.text.replace('&6', '')
+            color = 'rgb(255, 170, 1)'
+        if '&7' in self.text:
+            self.text = self.text.replace('&7', '')
+            color = 'rgb(169, 170, 170)'
+        if '&8' in self.text:
+            self.text = self.text.replace('&8', '')
+            color = 'rgb(86, 86, 86)'
+        if '&9' in self.text:
+            self.text = self.text.replace('&9', '')
+            color = 'rgb(86, 86, 255)'
+
+        if '&a' in self.text:
+            self.text = self.text.replace('&a', '')
+            color = 'rgb(85, 254, 85)'
+        if '&b' in self.text:
+            self.text = self.text.replace('&b', '')
+            color = 'rgb(85, 254, 254)'
+        if '&c' in self.text:
+            self.text = self.text.replace('&c', '')
+            color = 'rgb(254, 85, 85)'
+        if '&d' in self.text:
+            self.text = self.text.replace('&d', '')
+            color = 'rgb(254, 85, 254)'
+        if '&e' in self.text:
+            self.text = self.text.replace('&e', '')
+            color = 'rgb(254, 254, 85)'
+        if '&f' in self.text:
+            self.text = self.text.replace('&f', '')
+            color = 'rgb(254, 254, 254)'
+        if '&k' in self.text:
+            self.text = self.text.replace('&k', '')
+            glitch = True
+            # not completed
         if '&l' in self.text:
             self.text = self.text.replace('&l', '')
             bold += size / 3
@@ -26,6 +77,10 @@ class EagWrite:
         if '&m' in self.text:
             self.text = self.text.replace('&m', '')
             strikethrough = True
+        if '&r' in self.text:
+            self.text = self.text.replace('&r', '')
+            color = 'rgb(254, 254, 254)'
+            # not done
 
         total_width = 0
         max_height = 0
@@ -48,6 +103,10 @@ class EagWrite:
                 for row_index, row in enumerate(letter_data_lines):
                     for col_index, char in enumerate(row):
                         if char == '#':
+                            y_offset = 0
+                            if glitch:
+                                y_offset = random.randint(-size, size)
+
                             shadow = js.document.createElement('div')
                             shadow.style.width = f'{size + bold}px'
                             shadow.style.height = f'{size + bold}px'
@@ -55,7 +114,7 @@ class EagWrite:
                             shadow.style.pointerEvents = 'none'
                             shadow.style.position = 'absolute'
                             shadow.style.left = f'{x + self.extra_x + col_index * size + size - italic_offset * row_index}px'
-                            shadow.style.top = f'{y + row_index * size + size}px'
+                            shadow.style.top = f'{y + row_index * size + size + y_offset}px'
                             js.document.body.appendChild(shadow)
 
                             square = js.document.createElement('div')
@@ -65,7 +124,7 @@ class EagWrite:
                             square.style.pointerEvents = 'none'
                             square.style.position = 'absolute'
                             square.style.left = f'{x + self.extra_x + col_index * size - italic_offset * row_index}px'
-                            square.style.top = f'{y + row_index * size}px'
+                            square.style.top = f'{y + row_index * size + y_offset}px'
                             js.document.body.appendChild(square)
 
                             destroy_data.append(square)
