@@ -1,7 +1,11 @@
+from pyodide.ffi import create_proxy
+import random
+
 class EagWrite:
     def __init__(self):
         self.charmap = charmap
         self.extra_x = 0
+        self.glitch_intervals = []
 
     def write(self, text='Insert Text', x=0, y=0, color='black', shadow_color='#383838', size=5, spacing=3):
         destroy_data = []
@@ -15,56 +19,56 @@ class EagWrite:
         strikethrough = False
         glitch = False
 
+        # Text Formatting Options and Color Codes
         if '&1' in self.text:
             self.text = self.text.replace('&1', '')
-            color = 'rgb(0, 0, 169)'
+            color = 'rgb(0, 0, 169)'  # Dark Blue
         if '&2' in self.text:
             self.text = self.text.replace('&2', '')
-            color = 'rgb(1, 170, 1)'
+            color = 'rgb(0, 169, 0)'  # Dark Green
         if '&3' in self.text:
             self.text = self.text.replace('&3', '')
-            color = 'rgb(1, 170, 170)'
+            color = 'rgb(0, 169, 169)'  # Dark Aqua
         if '&4' in self.text:
             self.text = self.text.replace('&4', '')
-            color = 'rgb(170, 1, 1)'
+            color = 'rgb(169, 0, 0)'  # Dark Red
         if '&5' in self.text:
             self.text = self.text.replace('&5', '')
-            color = 'rgb(170, 1, 170)'
+            color = 'rgb(169, 0, 169)'  # Dark Purple
         if '&6' in self.text:
             self.text = self.text.replace('&6', '')
-            color = 'rgb(255, 170, 1)'
+            color = 'rgb(255, 169, 0)'  # Gold
         if '&7' in self.text:
             self.text = self.text.replace('&7', '')
-            color = 'rgb(169, 170, 170)'
+            color = 'rgb(169, 169, 169)'  # Gray
         if '&8' in self.text:
             self.text = self.text.replace('&8', '')
-            color = 'rgb(86, 86, 86)'
+            color = 'rgb(84, 84, 84)'  # Dark Gray
         if '&9' in self.text:
             self.text = self.text.replace('&9', '')
-            color = 'rgb(86, 86, 255)'
-
+            color = 'rgb(84, 84, 255)'  # Blue
         if '&a' in self.text:
             self.text = self.text.replace('&a', '')
-            color = 'rgb(85, 254, 85)'
+            color = 'rgb(84, 255, 84)'  # Green
         if '&b' in self.text:
             self.text = self.text.replace('&b', '')
-            color = 'rgb(85, 254, 254)'
+            color = 'rgb(84, 255, 255)'  # Aqua
         if '&c' in self.text:
             self.text = self.text.replace('&c', '')
-            color = 'rgb(254, 85, 85)'
+            color = 'rgb(255, 84, 84)'  # Red
         if '&d' in self.text:
             self.text = self.text.replace('&d', '')
-            color = 'rgb(254, 85, 254)'
+            color = 'rgb(255, 84, 255)'  # Light Purple
         if '&e' in self.text:
             self.text = self.text.replace('&e', '')
-            color = 'rgb(254, 254, 85)'
+            color = 'rgb(255, 255, 84)'  # Yellow
         if '&f' in self.text:
             self.text = self.text.replace('&f', '')
-            color = 'rgb(254, 254, 254)'
+            color = 'rgb(255, 255, 255)'  # White
+
         if '&k' in self.text:
             self.text = self.text.replace('&k', '')
             glitch = True
-            # not completed
         if '&l' in self.text:
             self.text = self.text.replace('&l', '')
             bold += size / 3
@@ -77,10 +81,6 @@ class EagWrite:
         if '&m' in self.text:
             self.text = self.text.replace('&m', '')
             strikethrough = True
-        if '&r' in self.text:
-            self.text = self.text.replace('&r', '')
-            color = 'rgb(254, 254, 254)'
-            # not done
 
         total_width = 0
         max_height = 0
@@ -104,8 +104,6 @@ class EagWrite:
                     for col_index, char in enumerate(row):
                         if char == '#':
                             y_offset = 0
-                            if glitch:
-                                y_offset = random.randint(-size, size)
 
                             shadow = js.document.createElement('div')
                             shadow.style.width = f'{size + bold}px'
@@ -130,7 +128,19 @@ class EagWrite:
                             destroy_data.append(square)
                             destroy_data.append(shadow)
 
-                            only_square_data.append(square)
+                            only_square_data.append((square, shadow))
+
+                            # Add animation effect if glitch is enabled
+                            if glitch:
+                                def apply_glitch(square=square, shadow=shadow, row_index=row_index):
+                                    random_y_offset = random.randint(-size, size)
+                                    square.style.top = f'{y + row_index * size + random_y_offset}px'
+                                    shadow.style.top = f'{y + row_index * size + size + random_y_offset}px'
+
+                                glitch_proxy = create_proxy(apply_glitch)
+                                interval = js.setInterval(glitch_proxy, 0)
+                                self.glitch_intervals.append((interval, glitch_proxy))
+
                     letter_pixel_width = max(letter_pixel_width, len(row) * size)
 
                 self.extra_x += letter_pixel_width + spacing
@@ -171,11 +181,15 @@ class EagWrite:
 
         return all_data
 
-    def destroy(_, write_data):
-        broadcast('(temporarily) Destroying text...')
+    def destroy(self, write_data):
         for square in write_data[0]:
             js.document.body.removeChild(square)
+        # Stop all glitch intervals and release proxy objects
+        for interval, proxy in self.glitch_intervals:
+            js.clearInterval(interval)
+            proxy.destroy()
+        self.glitch_intervals.clear()
 
-    def change_color(_, write_data, color):
-        for square in write_data[1]:
+    def change_color(self, write_data, color):
+        for square, _ in write_data[1]:
             square.style.backgroundColor = color
