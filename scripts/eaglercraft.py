@@ -194,12 +194,23 @@ def edit_profile_page(_=None):
     editprofile_frame.style.left = f'{windowW/2-150}px'
     js.document.body.appendChild(editprofile_frame)
 
+
+    dropdown_text = eagwrite.write(text='Choose a skin', x=1150, y=windowW/2-550, size=3, color='lime')
+    input_text = eagwrite.write(text='Enter a username', x=1130, y=windowW/2-750, size=3, color='lime')
+
     dropdown = js.document.createElement('button')
     dropdown.style.position = 'absolute'
     dropdown.className = 'eagler-dropdown'
-    dropdown.style.top = '350px'
+    dropdown.style.top = '450px'
     dropdown.style.left = f'{windowW/2+150}px'
     js.document.body.appendChild(dropdown)
+
+    input = js.document.createElement('button')
+    input.style.position = 'absolute'
+    input.className = 'eagler-input'
+    input.style.top = '250px'
+    input.style.left = f'{windowW/2+150}px'
+    js.document.body.appendChild(input)
 
 load_agreement()
 
