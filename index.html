@@ -77,6 +77,9 @@
 <body>
     <script>
         alert('This project isn\'t done yet. Press OK to continue.')
+        if (window.location.protocol === 'file:') {
+            alert('ERROR: You can\'t just open the index HTML file. Please run this project on a website with HTTP(s).');
+        }
         console.log('Welcome to Eaglercraft Console.')
         function title(titletext) {document.title = titletext;};
         function eagtekCrash(error, output) {
