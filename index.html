@@ -7,6 +7,7 @@
     <link href="assets/eagler/logo.png" rel="icon" type="image/png">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         @keyframes expandContract {
             0% {
@@ -32,7 +33,6 @@
 
         body {
             overflow: hidden;
-            font-family: 'Courier New', Courier, monospace;
         }
 
         .gui-widgets-button {
@@ -220,7 +220,6 @@
                 return `min(${baseValue}px, max(${minValue}px, calc(100vw - 40px)))`;
             }
 
-            // Create loading image
             let loadingImg = document.createElement('img');
             loadingImg.id = 'loadingimg';
             loadingImg.src = 'assets/eagler/extracting.png';
@@ -229,11 +228,11 @@
             loadingImg.style.margin = '20px auto'; 
             loadingImg.style.width = getResponsiveValue(500, 600, 200); 
 
-            // Create progress text
             let progressText = document.createElement('h1');
             progressText.id = 'progresstext';
             progressText.style.textAlign = 'center';
-            progressText.style.fontSize = getResponsiveValue(50, 768, 20);
+            progressText.style.fontFamily = '"Press Start 2P", monospace';
+            progressText.style.fontSize = getResponsiveValue(30, 768, 20);
             progressText.style.userSelect = 'none';
             progressText.textContent = 'Preparing...';
 
