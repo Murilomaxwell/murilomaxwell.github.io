@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="assets/eagler/logo.png" rel="icon" type="image/png">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         @keyframes expandContract {
@@ -60,16 +59,6 @@
         }
         .eagler-input:active {
             border-style: outset;
-        }
-        .eaglervm-button {
-            font-family: VT323;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-        }
-        .eaglervm-button:hover {
-            color: black;
-            background-color: white;
         }
     </style>
 
@@ -131,12 +120,11 @@
         }
 
         function saveDataToIndexedDB(dbName, storeName, key, data) {
-            let request = window.indexedDB.open(dbName, 1);  // Open or create the database with version 1
+            let request = window.indexedDB.open(dbName, 1); 
 
             request.onupgradeneeded = function (event) {
                 let db = event.target.result;
                 
-                // Create the object store if it doesn't already exist
                 if (!db.objectStoreNames.contains(storeName)) {
                     db.createObjectStore(storeName);
                 }
@@ -147,7 +135,6 @@
                 let transaction = db.transaction([storeName], 'readwrite');
                 let store = transaction.objectStore(storeName);
                 
-                // Save the data with the given key
                 let dataRequest = store.put(data, key);
 
                 dataRequest.onerror = function (event) {
@@ -418,74 +405,24 @@
             title('Ready');
             progressText.textContent = 'Press anywhere on the screen to start.';
 
-            bootMenuAvalible = true;
-
-            const bootText = document.createElement('div');
-            bootText.textContent = 'Press Y to open EaglerVM options';
-            bootText.style.position = 'absolute';
-            bootText.style.top = '0px';
-            bootText.style.right = '0px';
-            bootText.style.textAlign = 'center';
-            bootText.style.userSelect = 'none';
-            bootText.style.fontSize = '24px';
-            document.body.appendChild(bootText);
-
-            document.addEventListener('keydown', function(event) {
-                if (event.code === 'KeyY') {
-                    if(bootMenuAvalible == true) {
-                        bootMenuAvalible = false;
-                        console.log('EaglerVM options menu opened.');
-                        document.body.innerHTML = '';
-                        document.body.style.backgroundColor = 'black';
-
-                        const topText = document.createElement('h1')
-                        topText.style.textAlign = 'center';
-                        topText.style.userSelect = 'none';
-                        topText.style.fontSize = '44px';
-                        topText.style.color = 'white';
-                        topText.textContent = 'EaglerVM Options'
-                        topText.style.fontFamily = 'VT323';
-                        document.body.appendChild(topText);
-
-                        const restartButton = document.createElement('h1')
-                        restartButton.className = 'eaglervm-button';
-                        restartButton.textContent = 'Restart'
-                        restartButton.onclick = function() {
-                            window.location.reload();
-                        }
-                        document.body.appendChild(restartButton)
-
-                        const launchButton = document.createElement('h1')
-                        launchButton.className = 'eaglervm-button'
-                        launchButton.textContent = 'Launch Eaglercraft 1.13'
-                        document.body.appendChild(launchButton)
-                    }
-                    else {
-                        console.error('EaglerVM Options is not available once application started.')
-                    }
-                }
-            });
 
             let pyodideInitialized = false;
 
-            if (bootMenuAvalible == true) {
-                document.body.onclick = async function() {
-                    bootMenuAvalible = false;
-                    bootText.remove();
-                    themeButton.remove();
-                    if (pyodideInitialized) return; // Prevent re-initialization
-                    pyodideInitialized = true; // Set the flag to true
-                    progressText.style.animation = 'none';
-                    loadingImg.style.animation = 'vibrate 0.2s infinite';
-                    progressText.textContent = 'Launching Eaglercraft...';
-                    title('Launching...');
-                    try {
-                        await pyodide.runPythonAsync(output); // Use await inside async function
-                    } catch (error) {
-                        eagtekCrash(error, output);
-                    }
-                };
-            }
+            document.body.onclick = async function() {
+                themeButton.remove();
+                if (pyodideInitialized) return; // Prevent re-initialization
+                pyodideInitialized = true; // Set the flag to true
+                progressText.style.animation = 'none';
+                loadingImg.style.animation = 'vibrate 0.2s infinite';
+                progressText.textContent = 'Launching Eaglercraft...';
+                title('Launching...');
+                try {
+                    await pyodide.runPythonAsync(output); // Use await inside async function
+                } catch (error) {
+                    eagtekCrash(error, output);
+                }
+            };
+            
 
         }
         main();
