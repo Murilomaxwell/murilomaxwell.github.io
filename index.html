@@ -45,6 +45,14 @@
         .gui-widgets-button:hover {
             background-position: 256px 170px;
         }
+        .gui-widgets-button-disabled {
+            border: none;
+            pointer-events: none;
+            background-image: url('assets/gui/widgets.png');
+            background-position: 256px 210px;
+            width: 200px;
+            height: 20px;
+        }
         .eagler-dropdown {
             background-image: url('assets/eagler/dropdown.png');
             cursor: pointer;
@@ -124,6 +132,7 @@
         }
 
         let launchedEagler = false;
+        const isMobile = navigator.userAgentData.mobile;
 
         $(document).on('click', function() {
             if (!launchedEagler) {
