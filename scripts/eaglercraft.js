@@ -20,8 +20,8 @@ function launchEaglercraft() {
     let windowH = window.innerHeight;
 
 
-    let back = 0
-    if (windowH < 1920) {
+    let back = 0;
+    if (windowW < 1920) {
        back = windowH - 650
     }
 
@@ -233,7 +233,7 @@ function launchEaglercraft() {
             updateUsernameText();
         });
 
-        input.focus();
+input.focus();
     }
 
     class Titlescreen {
