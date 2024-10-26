@@ -3,11 +3,12 @@ class EagWrite {
         this.charmap = charmap;
         this.extra_x = 0;
         this.glitch_intervals = [];
-        this.square_adjust = 1;  // Default square size adjustment
+        this.square_adjust = 1;  
+        this.current_write_data = null; 
     }
 
     write(text = 'Insert Text', x = 0, y = 0, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1) {
-        this.square_adjust = square_adjust; // Set square size adjustment from method argument
+        this.square_adjust = square_adjust; 
         let destroy_data = [];
         let only_square_data = [];
         let all_data = [];
@@ -18,7 +19,7 @@ class EagWrite {
         let underline = false;
         let strikethrough = false;
         let glitch = false;
-
+    
         const colorCodes = {
             '&1': 'rgb(0, 0, 169)',
             '&2': 'rgb(0, 169, 0)',
@@ -36,14 +37,14 @@ class EagWrite {
             '&e': 'rgb(255, 255, 84)',
             '&f': 'rgb(255, 255, 255)'
         };
-
+    
         Object.keys(colorCodes).forEach(key => {
             if (this.text.includes(key)) {
                 this.text = this.text.replace(key, '');
                 color = colorCodes[key];
             }
         });
-
+    
         if (this.text.includes('&k')) {
             this.text = this.text.replace('&k', '');
             glitch = true;
@@ -64,79 +65,86 @@ class EagWrite {
             this.text = this.text.replace('&m', '');
             strikethrough = true;
         }
-
+    
         let total_width = 0;
         let max_height = 0;
-
+    
         for (let letter of this.text) {
             if (letter !== ' ') {
-                let letter_data = this.charmap[letter].trim().split('\n');
-                let letter_pixel_width = Math.max(...letter_data.map(line => line.length)) * size;
-                total_width += letter_pixel_width + spacing;
-                max_height = Math.max(max_height, letter_data.length * size);
+                if (this.charmap[letter]) {
+                    let letter_data = this.charmap[letter].trim().split('\n');
+                    let letter_pixel_width = Math.max(...letter_data.map(line => line.length)) * size;
+                    total_width += letter_pixel_width + spacing;
+                    max_height = Math.max(max_height, letter_data.length * size);
+                } else {
+                    console.warn(`Character "${letter}" not found in charmap.`);
+                }
             } else {
                 total_width += size * spacing;
             }
         }
-
+    
         const write_letter = (letter, x, y, color, size, shadow_color) => {
             let letter_pixel_width = 0;
             if (letter !== ' ') {
-                let letter_data = this.charmap[letter].trim().split('\n');
-                letter_data.forEach((row, row_index) => {
-                    row.split('').forEach((char, col_index) => {
-                        if (char === '#') {
-                            let y_offset = 0;
-
-                            let shadow = document.createElement('div');
-                            shadow.style.width = `${size * this.square_adjust + bold}px`;
-                            shadow.style.height = `${size * this.square_adjust + bold}px`;
-                            shadow.style.backgroundColor = shadow_color;
-                            shadow.style.pointerEvents = 'none';
-                            shadow.style.position = 'absolute';
-                            shadow.style.left = `${x + this.extra_x + col_index * size + size - italic_offset * row_index}px`;
-                            shadow.style.top = `${y + row_index * size + size + y_offset}px`;
-                            document.body.appendChild(shadow);
-
-                            let square = document.createElement('div');
-                            square.style.width = `${size * this.square_adjust + bold}px`;
-                            square.style.height = `${size * this.square_adjust + bold}px`;
-                            square.style.backgroundColor = color;
-                            square.style.pointerEvents = 'none';
-                            square.style.position = 'absolute';
-                            square.style.left = `${x + this.extra_x + col_index * size - italic_offset * row_index}px`;
-                            square.style.top = `${y + row_index * size + y_offset}px`;
-                            document.body.appendChild(square);
-
-                            destroy_data.push(square);
-                            destroy_data.push(shadow);
-
-                            only_square_data.push([square, shadow]);
-
-                            if (glitch) {
-                                const apply_glitch = () => {
-                                    let random_y_offset = Math.floor(Math.random() * (2 * size)) - size;
-                                    square.style.top = `${y + row_index * size + random_y_offset}px`;
-                                    shadow.style.top = `${y + row_index * size + size + random_y_offset}px`;
-                                };
-
-                                let interval = setInterval(apply_glitch, 0);
-                                this.glitch_intervals.push([interval, apply_glitch]);
+                if (this.charmap[letter]) {
+                    let letter_data = this.charmap[letter].trim().split('\n');
+                    letter_data.forEach((row, row_index) => {
+                        row.split('').forEach((char, col_index) => {
+                            if (char === '#') {
+                                let y_offset = 0;
+    
+                                let shadow = document.createElement('div');
+                                shadow.style.width = `${size * this.square_adjust + bold}px`;
+                                shadow.style.height = `${size * this.square_adjust + bold}px`;
+                                shadow.style.backgroundColor = shadow_color;
+                                shadow.style.pointerEvents = 'none';
+                                shadow.style.position = 'absolute';
+                                shadow.style.left = `${x + this.extra_x + col_index * size + size - italic_offset * row_index}px`;
+                                shadow.style.top = `${y + row_index * size + size + y_offset}px`;
+                                document.body.appendChild(shadow);
+    
+                                let square = document.createElement('div');
+                                square.style.width = `${size * this.square_adjust + bold}px`;
+                                square.style.height = `${size * this.square_adjust + bold}px`;
+                                square.style.backgroundColor = color;
+                                square.style.pointerEvents = 'none';
+                                square.style.position = 'absolute';
+                                square.style.left = `${x + this.extra_x + col_index * size - italic_offset * row_index}px`;
+                                square.style.top = `${y + row_index * size + y_offset}px`;
+                                document.body.appendChild(square);
+    
+                                destroy_data.push(square);
+                                destroy_data.push(shadow);
+                                only_square_data.push([square, shadow]);
+    
+                                if (glitch) {
+                                    const apply_glitch = () => {
+                                        let random_y_offset = Math.floor(Math.random() * (2 * size)) - size;
+                                        square.style.top = `${y + row_index * size + random_y_offset}px`;
+                                        shadow.style.top = `${y + row_index * size + size + random_y_offset}px`;
+                                    };
+    
+                                    let interval = setInterval(apply_glitch, 0);
+                                    this.glitch_intervals.push([interval, apply_glitch]);
+                                }
                             }
-                        }
+                        });
+                        letter_pixel_width = Math.max(letter_pixel_width, row.length * size);
                     });
-                    letter_pixel_width = Math.max(letter_pixel_width, row.length * size);
-                });
-                this.extra_x += letter_pixel_width + spacing;
+                    this.extra_x += letter_pixel_width + spacing;
+                } else {
+                    console.warn(`Character "${letter}" not found in charmap.`);
+                }
             } else {
                 this.extra_x += size * spacing;
             }
         };
-
+    
         for (let letter of this.text) {
             write_letter(letter, x, y, color, size, shadow_color);
         }
-
+    
         if (underline) {
             let underline_div = document.createElement('div');
             underline_div.style.width = `${total_width - spacing}px`;
@@ -149,7 +157,7 @@ class EagWrite {
             document.body.appendChild(underline_div);
             destroy_data.push(underline_div);
         }
-
+    
         if (strikethrough) {
             let strikethrough_div = document.createElement('div');
             strikethrough_div.style.width = `${total_width - spacing}px`;
@@ -162,16 +170,19 @@ class EagWrite {
             document.body.appendChild(strikethrough_div);
             destroy_data.push(strikethrough_div);
         }
-
+    
         all_data.push(destroy_data);
         all_data.push(only_square_data);
-
-        return all_data;
+        this.current_write_data = all_data; 
+    
+        return all_data; 
     }
 
     destroy(write_data) {
         for (let square of write_data[0]) {
-            document.body.removeChild(square);
+            if (square.parentNode) { 
+                document.body.removeChild(square);
+            }
         }
         this.glitch_intervals.forEach(([interval]) => clearInterval(interval));
         this.glitch_intervals = [];
@@ -181,6 +192,13 @@ class EagWrite {
         for (let [square] of write_data[1]) {
             square.style.backgroundColor = color;
         }
+    }
+
+    change_text(newText, x, y, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1) {
+        if (this.current_write_data) {
+            this.destroy(this.current_write_data);
+        }
+        this.write(newText, x, y, color, shadow_color, size, spacing, square_adjust); 
     }
 }
 

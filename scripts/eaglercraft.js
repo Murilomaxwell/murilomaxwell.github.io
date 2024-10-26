@@ -6,10 +6,10 @@ function broadcast(text) {
 broadcast('Eaglercraft 1.13 client started.');
 
 let chosen_skin = 'Default Steve';
-let eagler_words = ['Eagler', 'Darv', 'Yigg', 'Deev', 'Vigg', 'Yeer', 'Yeeish', 'Toothy', 'Toother'];
+let eagler_words = ['Eagler', 'Darv', 'Yigg', 'Deev', 'Vigg', 'Yeer'];
 let USERNAME = eagler_words[Math.floor(Math.random() * eagler_words.length)] + 
                eagler_words[Math.floor(Math.random() * eagler_words.length)] + 
-               (Math.floor(Math.random() * 9980) + 20);
+               (Math.floor(Math.random() * 79) + 20);
 broadcast(`Username: ${USERNAME}`);
 
 function launchEaglercraft() {
@@ -20,7 +20,10 @@ function launchEaglercraft() {
     let windowH = window.innerHeight;
 
 
-    const back = 1920 - windowW;
+    let back = 0
+    if (windowH < 1920) {
+       back = windowH - 650
+    }
 
     console.log(windowW, windowH)
 
@@ -35,7 +38,6 @@ function launchEaglercraft() {
             this.playing_audio = [];
         }
 
-        // Play audio from a given URL
         play(sound_url) {
             try {
                 const sound = new Audio(sound_url);
@@ -48,7 +50,6 @@ function launchEaglercraft() {
             }
         }
 
-        // Stop a specific audio
         stop(audio_data) {
             if (audio_data) {
                 audio_data.pause();
@@ -57,21 +58,18 @@ function launchEaglercraft() {
             }
         }
 
-        // Toggle looping for a specific audio
         toggle_loop(audio_data) {
             if (audio_data) {
-                audio_data.loop = !audio_data.loop; // Toggle loop state
+                audio_data.loop = !audio_data.loop;
             }
         }
 
-        // Adjust the volume of a specific audio
         adjust_volume(volume, audio_data) {
             if (audio_data) {
-                audio_data.volume = Math.min(Math.max(volume, 0), 1); // Ensure volume is between 0 and 1
+                audio_data.volume = Math.min(Math.max(volume, 0), 1); 
             }
         }
 
-        // Stop all currently playing audio
         stop_all_sound() {
             this.playing_audio.forEach(sound => this.stop(sound));
         }
@@ -81,11 +79,9 @@ function launchEaglercraft() {
     audio.play('assets/sounds/music/menu/menu1.ogg');
 
     let event_proxies = [];
-    let start_buttons = [];
-    let start_text = [];
 
     function create_button(text = 'Button', size = 2, onclick = null, x = 100, y = 100, text_tune = 70, state='gui-widgets-button') {
-        let button_text; // Declare button_text here
+        let button_text; 
         y += 20;
         let text_x = x + 50;
         let text_y = y - 5;
@@ -117,7 +113,6 @@ function launchEaglercraft() {
         button.addEventListener('mouseleave', leave_proxy);
         document.body.appendChild(button);
     
-        // Assign to the already declared button_text variable
         if (state == 'gui-widgets-button') {
             button_text = eagwrite.write(text, x + text_tune, text_y, 'white', '#383838', size + 0.5, 3, 1); 
         } else {
@@ -152,7 +147,7 @@ function launchEaglercraft() {
         if (is_agreement_loaded) return;
         is_agreement_loaded = true;
         console.log("Loading agreement screen.");
-        document.body.style.backgroundImage = "url('assets/eagler/editprofile_bg.png')";
+        document.body.style.backgroundImage = `url('assets/eagler/bg/${Math.floor(Math.random() * 7) + 1}.png')`;
 
         let text1 = eagwrite.write('&l Information', windowW / 2 - 140, 200, 'lime', '#383838', 5);
         let text2 = eagwrite.write('&o This software is NOT pirated', windowW / 2 - 300, 300, 'red', '#383838', 5);
@@ -171,19 +166,14 @@ function launchEaglercraft() {
         }
 
         let agreement_button = create_button('Next', 2, agreement_profile_page, windowW / 2 - 100, windowH - 300);
-        start_buttons.push(agreement_button);
     }
 
     function edit_profile_page() {
-        document.body.style.backgroundImage = "url('assets/eagler/editprofile_bg.png')";
+        document.body.style.backgroundImage = `url('assets/eagler/bg/${Math.floor(Math.random() * 7) + 1}.png')`;
         let edit_profile_text = eagwrite.write('Edit Profile', windowW / 2 - 140, 0, 'black', '#383838', 5);
-        start_text.push(edit_profile_text);
 
-        let done_button = create_button('Done', 2, titlescreen.open_titlescreen, windowW / 2 - 100, windowH - 200);
+        let done_button = create_button('Done', 2, titlescreen.open_titlescreen.bind(titlescreen), windowW / 2 - 100, windowH - 200);
         let import_skin_button = create_button('Import Skin', 2, null, windowW / 2 - 100, windowH - 300, 40, state='gui-widgets-button-disabled');
-
-        start_buttons.push(done_button);
-        start_buttons.push(import_skin_button);
 
         let editprofile_frame = document.createElement('div');
         editprofile_frame.style.position = 'absolute';
@@ -207,24 +197,49 @@ function launchEaglercraft() {
         document.body.appendChild(dropdown);
 
 
-        eagwrite.write(chosen_skin, 1140, 455, 'yellow', '#383838', 3);
+        skin_choice_text = eagwrite.write(chosen_skin, 1140-back, 455, 'yellow', '#383838', 3);
 
-        let input = document.createElement('button');
+        let initialUsername = USERNAME;
+
+        const MAX_USERNAME_LENGTH = 10;
+
+        let usernameTextData = eagwrite.write(initialUsername, 1130 - back, 250, 'yellow', '#383838', 3);
+
+        let input = document.createElement('input');
         input.className = 'eagler-input';
+        input.type = 'text';
         input.style.position = 'absolute';
         input.style.top = '250px';
-        input.style.left = `${windowW / 2 + 150}px`;
+        input.style.left = `${window.innerWidth / 2 + 150}px`;
+        input.style.opacity = '1';
+        input.style.width = '250px';
+        input.style.height = '30px';
+        input.style.zIndex = '-1';
         document.body.appendChild(input);
 
-        eagwrite.write(USERNAME, 1130, 260, 'yellow', '#383838', 3);
+        function updateUsernameText() {
+            if (usernameTextData) {
+                eagwrite.destroy(usernameTextData);
+            }
+            
+            let newText = input.value.slice(0, MAX_USERNAME_LENGTH) || initialUsername;
+            usernameTextData = eagwrite.write(newText, 1130 - back, 250, 'yellow', '#383838', 3);
+        }
+
+        input.addEventListener('input', function() {
+            if (input.value.length > MAX_USERNAME_LENGTH) {
+                input.value = input.value.slice(0, MAX_USERNAME_LENGTH);
+            }
+            updateUsernameText();
+        });
+
+        input.focus();
     }
 
     class Titlescreen {
-        clear_start() {
-            start_buttons.forEach(destroy_button);
-            start_buttons = [];
-            start_text.forEach(eagwrite.destroy);
-            start_text = [];
+        clear_start(_) {
+            console.log(USERNAME)
+            document.body.innerHTML = ''
         }
 
         open_titlescreen() {
