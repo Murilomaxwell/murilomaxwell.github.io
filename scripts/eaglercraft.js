@@ -12,6 +12,15 @@ let USERNAME = eagler_words[Math.floor(Math.random() * eagler_words.length)] +
                (Math.floor(Math.random() * 79) + 20);
 broadcast(`Username: ${USERNAME}`);
 
+const panoramaImages = [
+    'assets/gui/title/background/panorama_0.png',
+    'assets/gui/title/background/panorama_1.png',
+    'assets/gui/title/background/panorama_2.png',
+    'assets/gui/title/background/panorama_3.png',
+    'assets/gui/title/background/panorama_4.png',
+    'assets/gui/title/background/panorama_5.png'
+];
+
 function launchEaglercraft() {
     document.body.innerHTML = '';
     
@@ -22,7 +31,7 @@ function launchEaglercraft() {
 
     let back = 0;
     if (windowW < 1920) {
-       back = windowH - 650
+       back = windowH - 550
     }
 
     console.log(windowW, windowH)
@@ -233,7 +242,7 @@ function launchEaglercraft() {
             updateUsernameText();
         });
 
-input.focus();
+        input.focus();
     }
 
     class Titlescreen {
@@ -244,6 +253,83 @@ input.focus();
 
         open_titlescreen() {
             this.clear_start();
+            this.panorama()
+
+            eagwrite.write('Eaglercraft 1.13 BETA', 0, windowH-50, 'white', '#383838', 3)
+            eagwrite.write('created by AverageToothpasteEnjoyer', windowW-600, windowH-50, 'white', '#383838', 3)
+            create_button('Singleplayer', 2, null, windowW/2-100, windowH/2-100, 20)
+            create_button('Multiplayer', 2, null, windowW/2-100, windowH/2-50, 30)
+
+            const minec = document.createElement('img');
+            minec.className = 'minec'
+            document.body.append(minec)
+        }
+
+        panorama() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            document.body.style.margin = '0';
+            document.body.style.overflow = 'hidden';
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableZoom = false;
+            controls.enablePan = false;
+            controls.rotateSpeed = 0.3;
+            controls.autoRotate = true;  // Enable auto-rotation
+            controls.autoRotateSpeed = 0.5;  // Adjust speed as needed
+
+            const textureLoader = new THREE.TextureLoader();
+
+            const materials = [
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[2]),
+                    side: THREE.BackSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[0]),
+                    side: THREE.BackSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[4]),
+                    side: THREE.BackSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[5]),
+                    side: THREE.BackSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[1]),
+                    side: THREE.BackSide
+                }),
+                new THREE.MeshBasicMaterial({
+                    map: textureLoader.load(panoramaImages[3]),
+                    side: THREE.BackSide
+                })
+            ];
+
+            const sphereGeometry = new THREE.BoxGeometry(500, 500, 500);
+            const sphere = new THREE.Mesh(sphereGeometry, materials);
+            scene.add(sphere);
+
+            camera.position.set(0, 0, 0.1);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();  // This will handle the auto-rotation
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         }
     }
 
@@ -251,3 +337,5 @@ input.focus();
 
     load_agreement();
 }
+
+    
