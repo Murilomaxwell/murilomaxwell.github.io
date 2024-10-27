@@ -21,19 +21,21 @@
             }
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0; 
+            }
+            to {
+                opacity: 1; 
+            }
+        }
+
         @keyframes vibrate {
             0% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
             50% { transform: translateX(0); }
             75% { transform: translateX(5px); }
             100% { transform: translateX(0); }
-        }
-
-        .minec {
-            background-image: url('assets/gui/title/minecraft.png');
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
         }
 
         body {

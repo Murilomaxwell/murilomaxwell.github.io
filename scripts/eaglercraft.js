@@ -89,7 +89,7 @@ function launchEaglercraft() {
 
     let event_proxies = [];
 
-    function create_button(text = 'Button', size = 2, onclick = null, x = 100, y = 100, text_tune = 70, state='gui-widgets-button') {
+    function create_button(text = 'Button', size = 2, onclick = null, x = 100, y = 100, text_tune = 70, state='gui-widgets-button', animation='none') {
         let button_text; 
         y += 20;
         let text_x = x + 50;
@@ -115,6 +115,7 @@ function launchEaglercraft() {
         button.className = state;
         button.style.transform = `scale(${size})`;
         button.style.position = 'absolute';
+        button.style.animation = animation;
         button.style.left = `${x}px`;
         button.style.top = `${y}px`;
         button.addEventListener('click', click_proxy);
@@ -123,9 +124,9 @@ function launchEaglercraft() {
         document.body.appendChild(button);
     
         if (state == 'gui-widgets-button') {
-            button_text = eagwrite.write(text, x + text_tune, text_y, 'white', '#383838', size + 0.5, 3, 1); 
+            button_text = eagwrite.write(text, x + text_tune, text_y, 'white', '#383838', size + 0.5, 3, 1, animation); 
         } else {
-            button_text = eagwrite.write(text, x + text_tune, text_y, 'rgb(121, 121, 121)', null, size + 0.5, 3, 1);
+            button_text = eagwrite.write(text, x + text_tune, text_y, 'rgb(121, 121, 121)', null, size + 0.5, 3, 1, animation);
         }
     
         function destroy() {
@@ -253,16 +254,33 @@ function launchEaglercraft() {
 
         open_titlescreen() {
             this.clear_start();
-            this.panorama()
+            this.panorama();
 
-            eagwrite.write('Eaglercraft 1.13 BETA', 0, windowH-50, 'white', '#383838', 3)
-            eagwrite.write('created by AverageToothpasteEnjoyer', windowW-600, windowH-50, 'white', '#383838', 3)
-            create_button('Singleplayer', 2, null, windowW/2-100, windowH/2-100, 20)
-            create_button('Multiplayer', 2, null, windowW/2-100, windowH/2-50, 30)
+            const minecraft_photo = document.createElement('img');
+            minecraft_photo.src = 'assets/gui/title/minecraft.png';
+            minecraft_photo.style.position = 'absolute';
+            minecraft_photo.style.width = '500px';
+            minecraft_photo.style.left = '50%';
+            minecraft_photo.style.top = '100px';
+            minecraft_photo.style.animation = 'fadeIn 2s forwards';
+            minecraft_photo.style.transform = 'translate(-50%, -50%)'; 
+            document.body.appendChild(minecraft_photo); 
 
-            const minec = document.createElement('img');
-            minec.className = 'minec'
-            document.body.append(minec)
+            const java_photo = document.createElement('img');
+            java_photo.src = 'assets/gui/title/edition.png';
+            java_photo.style.position = 'absolute';
+            java_photo.style.width = '250px';
+            java_photo.style.left = '50%';
+            java_photo.style.top = '140px';
+            java_photo.style.animation = 'fadeIn 2s forwards';
+            java_photo.style.transform = 'translate(-50%, -50%)';
+            document.body.append(java_photo)
+
+        
+            eagwrite.write('Eaglercraft 1.13 BETA', 0, windowH-50, 'white', '#383838', 3, 3, 1, 'fadeIn 2s forwards');
+            eagwrite.write('created by AverageToothpasteEnjoyer', windowW-600, windowH-50, 'white', '#383838', 3);
+            create_button('Singleplayer', 2, null, windowW/2-100, windowH/2-100, 20, 'gui-widgets-button', 'fadeIn 2s forwards');
+            create_button('Multiplayer', 2, null, windowW/2-100, windowH/2-50, 30, 'gui-widgets-button', 'fadeIn 2s forwards');
         }
 
         panorama() {

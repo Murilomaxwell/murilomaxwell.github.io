@@ -7,7 +7,7 @@ class EagWrite {
         this.current_write_data = null; 
     }
 
-    write(text = 'Insert Text', x = 0, y = 0, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1) {
+    write(text = 'Insert Text', x = 0, y = 0, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1, animation='none') {
         this.square_adjust = square_adjust; 
         let destroy_data = [];
         let only_square_data = [];
@@ -102,6 +102,7 @@ class EagWrite {
                                 shadow.style.position = 'absolute';
                                 shadow.style.left = `${x + this.extra_x + col_index * size + size - italic_offset * row_index}px`;
                                 shadow.style.top = `${y + row_index * size + size + y_offset}px`;
+                                shadow.style.animation = animation;
                                 document.body.appendChild(shadow);
     
                                 let square = document.createElement('div');
@@ -112,6 +113,7 @@ class EagWrite {
                                 square.style.position = 'absolute';
                                 square.style.left = `${x + this.extra_x + col_index * size - italic_offset * row_index}px`;
                                 square.style.top = `${y + row_index * size + y_offset}px`;
+                                square.style.animation = animation;
                                 document.body.appendChild(square);
     
                                 destroy_data.push(square);
