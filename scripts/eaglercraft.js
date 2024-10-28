@@ -21,6 +21,21 @@ const panoramaImages = [
     'assets/gui/title/background/panorama_5.png'
 ];
 
+const splashTexts = [
+    'eaglercraft 1.13',
+    'toothpaste is good',
+    'yum toothpaste',
+    'i eat toothpaste',
+    'batteries not included',
+    'I am wanted by FBI',
+    'try it with orange juice',
+]
+
+function getRandomItem(arr) {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    return arr[randomIndex];
+}
+
 function launchEaglercraft() {
     document.body.innerHTML = '';
     
@@ -31,7 +46,7 @@ function launchEaglercraft() {
 
     let back = 0;
     if (windowW < 1920) {
-       back = windowH - 550
+       back = windowH - 750
     }
 
     console.log(windowW, windowH)
@@ -253,6 +268,7 @@ function launchEaglercraft() {
         }
 
         open_titlescreen() {
+            let splashText = getRandomItem(splashTexts)
             this.clear_start();
             this.panorama();
 
@@ -273,8 +289,10 @@ function launchEaglercraft() {
             java_photo.style.left = '50%';
             java_photo.style.top = '140px';
             java_photo.style.animation = 'fadeIn 2s forwards';
-            java_photo.style.transform = 'translate(-50%, -50%)';
+            java_photo.style.transform = 'translate(-40%, -60%)';
             document.body.append(java_photo)
+
+            eagwrite.expandContract(eagwrite.write(splashText, x=windowW/2, y=170, 'rgb(255, 255, 84)', '#383838', 3, 3, 1, 'none', -30), 1500, 'ease-in-out')
 
         
             eagwrite.write('Eaglercraft 1.13 BETA', 0, windowH-50, 'white', '#383838', 3, 3, 1, 'fadeIn 2s forwards');
@@ -337,7 +355,7 @@ function launchEaglercraft() {
 
             function animate() {
                 requestAnimationFrame(animate);
-                controls.update();  // This will handle the auto-rotation
+                controls.update();  
                 renderer.render(scene, camera);
             }
 

@@ -7,9 +7,18 @@ class EagWrite {
         this.current_write_data = null; 
     }
 
-    write(text = 'Insert Text', x = 0, y = 0, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1, animation='none') {
+    write(text = 'Insert Text', x = 0, y = 0, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1, animation='none', rotation = 0) {
+        // Create a container div for the entire text
+        let container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = `${x}px`;
+        container.style.top = `${y}px`;
+        container.style.transform = `rotate(${rotation}deg)`;
+        container.style.transformOrigin = 'left top';
+        document.body.appendChild(container);
+
         this.square_adjust = square_adjust; 
-        let destroy_data = [];
+        let destroy_data = [container];
         let only_square_data = [];
         let all_data = [];
         this.extra_x = 0;
@@ -100,10 +109,10 @@ class EagWrite {
                                 shadow.style.backgroundColor = shadow_color;
                                 shadow.style.pointerEvents = 'none';
                                 shadow.style.position = 'absolute';
-                                shadow.style.left = `${x + this.extra_x + col_index * size + size - italic_offset * row_index}px`;
-                                shadow.style.top = `${y + row_index * size + size + y_offset}px`;
+                                shadow.style.left = `${this.extra_x + col_index * size + size - italic_offset * row_index}px`;
+                                shadow.style.top = `${row_index * size + size + y_offset}px`;
                                 shadow.style.animation = animation;
-                                document.body.appendChild(shadow);
+                                container.appendChild(shadow);
     
                                 let square = document.createElement('div');
                                 square.style.width = `${size * this.square_adjust + bold}px`;
@@ -111,10 +120,10 @@ class EagWrite {
                                 square.style.backgroundColor = color;
                                 square.style.pointerEvents = 'none';
                                 square.style.position = 'absolute';
-                                square.style.left = `${x + this.extra_x + col_index * size - italic_offset * row_index}px`;
-                                square.style.top = `${y + row_index * size + y_offset}px`;
+                                square.style.left = `${this.extra_x + col_index * size - italic_offset * row_index}px`;
+                                square.style.top = `${row_index * size + y_offset}px`;
                                 square.style.animation = animation;
-                                document.body.appendChild(square);
+                                container.appendChild(square);
     
                                 destroy_data.push(square);
                                 destroy_data.push(shadow);
@@ -123,8 +132,8 @@ class EagWrite {
                                 if (glitch) {
                                     const apply_glitch = () => {
                                         let random_y_offset = Math.floor(Math.random() * (2 * size)) - size;
-                                        square.style.top = `${y + row_index * size + random_y_offset}px`;
-                                        shadow.style.top = `${y + row_index * size + size + random_y_offset}px`;
+                                        square.style.top = `${row_index * size + random_y_offset}px`;
+                                        shadow.style.top = `${row_index * size + size + random_y_offset}px`;
                                     };
     
                                     let interval = setInterval(apply_glitch, 0);
@@ -154,12 +163,12 @@ class EagWrite {
             underline_div.style.backgroundColor = color;
             underline_div.style.pointerEvents = 'none';
             underline_div.style.position = 'absolute';
-            underline_div.style.left = `${x}px`;
-            underline_div.style.top = `${y + max_height + size / 3}px`;
-            document.body.appendChild(underline_div);
+            underline_div.style.left = '0px';
+            underline_div.style.top = `${max_height + size / 3}px`;
+            container.appendChild(underline_div);
             destroy_data.push(underline_div);
         }
-    
+
         if (strikethrough) {
             let strikethrough_div = document.createElement('div');
             strikethrough_div.style.width = `${total_width - spacing}px`;
@@ -167,27 +176,17 @@ class EagWrite {
             strikethrough_div.style.backgroundColor = color;
             strikethrough_div.style.pointerEvents = 'none';
             strikethrough_div.style.position = 'absolute';
-            strikethrough_div.style.left = `${x}px`;
-            strikethrough_div.style.top = `${y + max_height / 2}px`;
-            document.body.appendChild(strikethrough_div);
+            strikethrough_div.style.left = '0px';
+            strikethrough_div.style.top = `${max_height / 2}px`;
+            container.appendChild(strikethrough_div);
             destroy_data.push(strikethrough_div);
         }
-    
+
         all_data.push(destroy_data);
         all_data.push(only_square_data);
-        this.current_write_data = all_data; 
-    
-        return all_data; 
-    }
+        this.current_write_data = all_data;
 
-    destroy(write_data) {
-        for (let square of write_data[0]) {
-            if (square.parentNode) { 
-                document.body.removeChild(square);
-            }
-        }
-        this.glitch_intervals.forEach(([interval]) => clearInterval(interval));
-        this.glitch_intervals = [];
+        return all_data;
     }
 
     change_color(write_data, color) {
@@ -196,14 +195,104 @@ class EagWrite {
         }
     }
 
-    change_text(newText, x, y, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1) {
+    change_text(newText, x, y, color = 'black', shadow_color = '#383838', size = 5, spacing = 3, square_adjust = 1, animation='none', rotation = 0) {
         if (this.current_write_data) {
             this.destroy(this.current_write_data);
         }
-        this.write(newText, x, y, color, shadow_color, size, spacing, square_adjust); 
+        this.write(newText, x, y, color, shadow_color, size, spacing, square_adjust, animation, rotation); 
     }
-}
 
+    destroy(data = null) {
+        if (data === null) {
+            if (this.current_write_data) {
+                data = this.current_write_data;
+            } else {
+                console.warn('No data provided and no current write data available.');
+                return;
+            }
+        }
+    
+        if (this.glitch_intervals) {
+            this.glitch_intervals.forEach(interval => {
+                clearInterval(interval[0]);
+            });
+            this.glitch_intervals = [];
+        }
+    
+        if (Array.isArray(data)) {
+            data[0].forEach(element => {
+                if (element && element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
+            });
+        }
+    }
+
+    expandContract(data, duration = 1000, easing = 'ease-in-out') {
+        if (!data) {
+            console.warn('No write data provided for expandContract animation.');
+            return;
+        }
+    
+        const startSpacing = 1; // Or whatever your base spacing should be
+        const maxSpacingChange = 0.4; // Adjust for desired effect
+        let startTime = null;
+        let isExpanding = true;
+    
+        // Store original left, top, width, and height for each square
+        data[1].forEach(([square, shadow]) => {
+            square.originalLeft = parseFloat(square.style.left);
+            square.originalTop = parseFloat(square.style.top);
+            square.originalWidth = parseFloat(square.style.width);
+            square.originalHeight = parseFloat(square.style.height);
+            shadow.originalLeft = parseFloat(shadow.style.left);
+            shadow.originalTop = parseFloat(shadow.style.top);
+            shadow.originalWidth = parseFloat(shadow.style.width);
+            shadow.originalHeight = parseFloat(shadow.style.height);
+        });
+    
+        function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+    
+            const spacingChange = isExpanding ? 
+                maxSpacingChange * easeInOut(progress) : 
+                maxSpacingChange - (maxSpacingChange * easeInOut(progress));
+            const currentSpacing = startSpacing + spacingChange; 
+    
+            data[1].forEach(([square, shadow]) => {
+                // Apply spacing to left and top properties relative to original positions
+                square.style.left = `${square.originalLeft * currentSpacing}px`;
+                square.style.top = `${square.originalTop * currentSpacing}px`;
+                shadow.style.left = `${shadow.originalLeft * currentSpacing}px`; 
+                shadow.style.top = `${shadow.originalTop * currentSpacing}px`;
+    
+                // Scale square and shadow sizes
+                square.style.width = `${square.originalWidth * currentSpacing}px`;
+                square.style.height = `${square.originalHeight * currentSpacing}px`;
+                shadow.style.width = `${shadow.originalWidth * currentSpacing}px`;
+                shadow.style.height = `${shadow.originalHeight * currentSpacing}px`;
+            });
+    
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                isExpanding = !isExpanding;
+                startTime = null;
+                requestAnimationFrame(animate);
+            }
+        }
+    
+        function easeInOut(t) {
+            return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+        }
+    
+        requestAnimationFrame(animate);
+    }
+    
+
+}
 
 
 
