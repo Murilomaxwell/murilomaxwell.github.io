@@ -234,12 +234,11 @@ class EagWrite {
             return;
         }
     
-        const startSpacing = 1; // Or whatever your base spacing should be
-        const maxSpacingChange = 0.4; // Adjust for desired effect
+        const startSpacing = 1; 
+        const maxSpacingChange = 0.4; 
         let startTime = null;
         let isExpanding = true;
     
-        // Store original left, top, width, and height for each square
         data[1].forEach(([square, shadow]) => {
             square.originalLeft = parseFloat(square.style.left);
             square.originalTop = parseFloat(square.style.top);
@@ -262,13 +261,11 @@ class EagWrite {
             const currentSpacing = startSpacing + spacingChange; 
     
             data[1].forEach(([square, shadow]) => {
-                // Apply spacing to left and top properties relative to original positions
                 square.style.left = `${square.originalLeft * currentSpacing}px`;
                 square.style.top = `${square.originalTop * currentSpacing}px`;
                 shadow.style.left = `${shadow.originalLeft * currentSpacing}px`; 
                 shadow.style.top = `${shadow.originalTop * currentSpacing}px`;
     
-                // Scale square and shadow sizes
                 square.style.width = `${square.originalWidth * currentSpacing}px`;
                 square.style.height = `${square.originalHeight * currentSpacing}px`;
                 shadow.style.width = `${shadow.originalWidth * currentSpacing}px`;

@@ -46,7 +46,7 @@ function launchEaglercraft() {
 
     let back = 0;
     if (windowW < 1920) {
-       back = windowH - 750
+       back = windowH - 250
     }
 
     console.log(windowW, windowH)
@@ -311,13 +311,6 @@ function launchEaglercraft() {
             document.body.style.margin = '0';
             document.body.style.overflow = 'hidden';
 
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableZoom = false;
-            controls.enablePan = false;
-            controls.rotateSpeed = 0.3;
-            controls.autoRotate = true;  // Enable auto-rotation
-            controls.autoRotateSpeed = 0.5;  // Adjust speed as needed
-
             const textureLoader = new THREE.TextureLoader();
 
             const materials = [
@@ -353,9 +346,13 @@ function launchEaglercraft() {
 
             camera.position.set(0, 0, 0.1);
 
+            const rotationSpeed = 0.001;
+
             function animate() {
                 requestAnimationFrame(animate);
-                controls.update();  
+                
+                sphere.rotation.y += rotationSpeed;  
+
                 renderer.render(scene, camera);
             }
 
