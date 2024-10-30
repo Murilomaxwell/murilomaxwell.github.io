@@ -4,9 +4,9 @@
 
 ### ⚠ ATTENTION MOJANG AND GITHUB STAFF: This Eaglercraft client **isn't pirated**, it is just an *accurate recreation* of Minecraft ⚠
 
-# Eaglercraft 1.13
+# Eaglercraft 1.20.1
 
-## Created by RaveTek, Forked From Eagler 1.20.1
+## Created by RaveTek, Forked From Eagler 1.13
 
 <img src="preview.png" alt="Preview Photo Not Found"/>
 
