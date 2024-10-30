@@ -3,7 +3,7 @@ function broadcast(text) {
     console.log(`[EAGLERCRAFT] (${now}): ${text}`);
 }
 
-broadcast('Eaglercraft 1.13 client started.');
+broadcast('Eaglercraft 1.20 client started.');
 
 let chosen_skin = 'Default Steve';
 let eagler_words = ['Eagler', 'Darv', 'Yigg', 'Deev', 'Vigg', 'Yeer'];
@@ -22,13 +22,13 @@ const panoramaImages = [
 ];
 
 const splashTexts = [
-    'eaglercraft 1.13',
-    'toothpaste is good',
-    'yum toothpaste',
-    'i eat toothpaste',
-    'batteries not included',
-    'I am wanted by FBI',
-    'try it with orange juice',
+    'eaglercraft 1.20',
+    'woohooo!',
+    'You Eagler!',
+    'You Vigg!',
+    'You Darviggler!',
+    'You Raven!',
+    'Play it Now!',
 ]
 
 function getRandomItem(arr) {
@@ -173,9 +173,6 @@ function launchEaglercraft() {
         is_agreement_loaded = true;
         console.log("Loading agreement screen.");
         document.body.style.backgroundImage = `url('assets/eagler/bg/${Math.floor(Math.random() * 7) + 1}.png')`;
-
-        let text1 = eagwrite.write('&l Information', windowW / 2 - 140, 200, 'lime', '#383838', 5);
-        let text2 = eagwrite.write('&o This software is NOT pirated', windowW / 2 - 300, 300, 'red', '#383838', 5);
         let text3 = eagwrite.write('&n This is just a RECREATION of Minecraft', windowW / 2 - 400, 400, 'yellow', '#383838', 5);
         let text4 = eagwrite.write('Any DMCA request toward this client is unnecessary', windowW / 2 - 700, 500, 'orange', '#383838', 5);
 
@@ -190,74 +187,8 @@ function launchEaglercraft() {
             edit_profile_page();
         }
 
-        let agreement_button = create_button('Next', 2, agreement_profile_page, windowW / 2 - 100, windowH - 300);
+        let agreement_button = create_button('Agree', 2, titlescreen.open_titlescreen.bind(titlescreen), windowW / 2 - 100, windowH - 300);
     }
-
-    function edit_profile_page() {
-        document.body.style.backgroundImage = `url('assets/eagler/bg/${Math.floor(Math.random() * 7) + 1}.png')`;
-        let edit_profile_text = eagwrite.write('Edit Profile', windowW / 2 - 140, 0, 'black', '#383838', 5);
-
-        let done_button = create_button('Done', 2, titlescreen.open_titlescreen.bind(titlescreen), windowW / 2 - 100, windowH - 200);
-        let import_skin_button = create_button('Import Skin', 2, null, windowW / 2 - 100, windowH - 300, 40, state='gui-widgets-button-disabled');
-
-        let editprofile_frame = document.createElement('div');
-        editprofile_frame.style.position = 'absolute';
-        editprofile_frame.style.backgroundColor = 'rgb(0, 0, 21)';
-        editprofile_frame.style.border = '2px solid yellow';
-        editprofile_frame.style.width = '250px';
-        editprofile_frame.style.height = '400px';
-        editprofile_frame.style.top = '200px';
-        editprofile_frame.style.left = `${windowW / 2 - 150}px`;
-        document.body.appendChild(editprofile_frame);
-
-        eagwrite.write('Choose a skin', 1150-back, 410, 'lime', '#383838', 3);
-        eagwrite.write('Enter a username', 1130-back, 210, 'lime', '#383838', 3);
-
-
-        let dropdown = document.createElement('button');
-        dropdown.className = 'eagler-dropdown';
-        dropdown.style.position = 'absolute';
-        dropdown.style.top = '450px';
-        dropdown.style.left = `${windowW / 2 + 150}px`;
-        document.body.appendChild(dropdown);
-
-
-        skin_choice_text = eagwrite.write(chosen_skin, 1140-back, 455, 'yellow', '#383838', 3);
-
-        let initialUsername = USERNAME;
-
-        const MAX_USERNAME_LENGTH = 10;
-
-        let usernameTextData = eagwrite.write(initialUsername, 1130 - back, 250, 'yellow', '#383838', 3);
-
-        let input = document.createElement('input');
-        input.className = 'eagler-input';
-        input.type = 'text';
-        input.style.position = 'absolute';
-        input.style.top = '250px';
-        input.style.left = `${window.innerWidth / 2 + 150}px`;
-        input.style.opacity = '1';
-        input.style.width = '250px';
-        input.style.height = '30px';
-        input.style.zIndex = '-1';
-        document.body.appendChild(input);
-
-        function updateUsernameText() {
-            if (usernameTextData) {
-                eagwrite.destroy(usernameTextData);
-            }
-            
-            let newText = input.value.slice(0, MAX_USERNAME_LENGTH) || initialUsername;
-            usernameTextData = eagwrite.write(newText, 1130 - back, 250, 'yellow', '#383838', 3);
-        }
-
-        input.addEventListener('input', function() {
-            if (input.value.length > MAX_USERNAME_LENGTH) {
-                input.value = input.value.slice(0, MAX_USERNAME_LENGTH);
-            }
-            updateUsernameText();
-        });
-
         input.focus();
     }
 
@@ -295,10 +226,11 @@ function launchEaglercraft() {
             eagwrite.expandContract(eagwrite.write(splashText, x=windowW/2, y=170, 'rgb(255, 255, 84)', '#383838', 3, 3, 1, 'none', -30), 1500, 'ease-in-out')
 
         
-            eagwrite.write('Eaglercraft 1.13 BETA', 0, windowH-50, 'white', '#383838', 3, 3, 1, 'fadeIn 2s forwards');
-            eagwrite.write('created by AverageToothpasteEnjoyer', windowW-600, windowH-50, 'white', '#383838', 3);
+            eagwrite.write('Minecraft 1.20.1', 0, windowH-50, 'white', '#383838', 3, 3, 1, 'fadeIn 2s forwards');
+            eagwrite.write('::RECREATION::', windowW-600, windowH-50, 'white', '#383838', 3);
             create_button('Singleplayer', 2, null, windowW/2-100, windowH/2-100, 20, 'gui-widgets-button', 'fadeIn 2s forwards');
             create_button('Multiplayer', 2, null, windowW/2-100, windowH/2-50, 30, 'gui-widgets-button', 'fadeIn 2s forwards');
+            create_button('Mods', 2, null, windowW/2-100, windowH/2-50, 40, 'gui-widgets-button-disabled', 'fadeIn 2s forwards');
         }
 
         panorama() {
